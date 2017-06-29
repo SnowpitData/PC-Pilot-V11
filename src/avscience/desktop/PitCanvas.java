@@ -1255,7 +1255,15 @@ public class PitCanvas extends Canvas
     		String rho = pit.getDensityProfile().getDensity(I);
     		if ( rho.trim().length()>0)
     		{
-	    		Float rh = new Float(rho);
+                        Float rh = new Float(0.0);
+                        try
+                        {
+                            rh = new Float(rho);
+                        }
+                        catch(Exception ex)
+                        {
+                            System.out.println(ex.toString());
+                        }
 	    		if ( rh.floatValue()>0.0f )
 	    		{
 		    		int d = I.intValue();

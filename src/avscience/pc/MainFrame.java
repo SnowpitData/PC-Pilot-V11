@@ -43,8 +43,8 @@ public class MainFrame extends Frame implements ListFrame
     final static int dataPushSize=8000;
     
     public avscience.pc.SPV5DataStore store = avscience.pc.SPV5DataStore.getInstance();
-    public final static int bld = 58;
-    final static String vDate = "V.10-8087 "+ bld;
+    public final static int bld = 60;
+    final static String vDate = "V.11-8087 "+ bld;
     public final static String version = vDate+" PC: "+System.getProperty( "os.name" );
     public java.awt.List  pitList;
     public java.awt.List  occList;
