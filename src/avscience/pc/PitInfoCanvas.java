@@ -138,9 +138,9 @@ public class PitInfoCanvas extends Canvas implements MouseListener
 	        if ( dt==null ) dt=" ";
 	      	boolean udate = true;
 	      	if (dt.trim().length()<8) udate = false;
-	      	String time = pit.getTime();
-	      	if (time==null)time=" ";
-	      	if ( udate )
+	      	//String time = pit.getTime();
+	      //	if (time==null)time=" ";
+	      /*	if ( udate )
 	      	{
 		      	String yr="0";
 		      	String mnth="0";
@@ -173,7 +173,8 @@ public class PitInfoCanvas extends Canvas implements MouseListener
 		        g.drawString(date.toString(), x, y);
                         }
                         catch(Exception e){System.out.println(e.toString());}
-		    }
+		    }*/
+                    g.drawString(pit.getDateString(), x, y);
 		}
         	
         g.setFont(f);

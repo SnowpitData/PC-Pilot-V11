@@ -164,7 +164,7 @@ public class FileWriter
 			}
 		}
 		////////
-		File file = new File(pit.getLocation().getName()+"-"+pit.getDate()+"-"+pit.getTime()+".txt");
+		File file = new File(pit.getLocation().getName()+"-"+pit.getDateString()+".txt");
 		FileOutputStream out = null;
 		PrintWriter writer = null;
 		String fin = buffer.toString();
