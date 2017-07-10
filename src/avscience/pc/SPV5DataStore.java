@@ -128,24 +128,6 @@ public class SPV5DataStore implements java.io.Serializable
   		return null;
   	}
   	
-  	public avscience.ppc.PitObs getPitByArchName(String name)
-  	{
-  		if ((name==null) || (name.trim().length()<2)) return null;
-  		System.out.println("getPitByArchName: "+name);
-  		java.util.Enumeration e = getPits().elements();
-  		while ( e.hasMoreElements())
-  		{
-  			avscience.ppc.PitObs pit = (avscience.ppc.PitObs) e.nextElement();	
-  			if (pit.getArchName().equals(name))
-  			{
-  				System.out.println("returning pit: serial "+pit.getSerial()+" name: "+name);
-  				return pit;
-  			}
-  			
-  		}
-  		return null;
-  	}
-  	
   	public avscience.ppc.AvOccurence getOccByName(String name)
   	{
   		if ((name==null) || (name.trim().length()<2)) return null;
@@ -226,7 +208,6 @@ public class SPV5DataStore implements java.io.Serializable
   		String data=null;
   		
   		data = (String) Occs.get(serial);
-  		//System.out.println("data: "+data);
   		avscience.ppc.AvOccurence pocc = null;
   		if (data==null)
   		{
