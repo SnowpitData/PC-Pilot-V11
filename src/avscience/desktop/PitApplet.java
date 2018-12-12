@@ -19,6 +19,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.ObjectInputStream;
 import java.io.PrintStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 
@@ -67,8 +68,6 @@ public class PitApplet extends Frame
     int height;
     private static final String server = "http://kahrlconsulting.com:8087/avscience/PitListServlet";
     private static final String pitserver = "http://kahrlconsulting.com:8087/avscience/PitServlet";
-//   	public static final String server="http://home.kahrlconsulting.com/avscience/PitListServlet";
-//	public static final String pitserver="http://home.kahrlconsulting.com/avscience/PitServlet";
     private static final int yoffset = 36;
     public String pitlist[][];
     private String occlist[][];
@@ -373,7 +372,7 @@ public class PitApplet extends Frame
     {
         boolean flag = false;
         StringBuffer stringbuffer = new StringBuffer();
-        stringbuffer.append("WHERE ");
+        stringbuffer.append("WHERE");
         String s = nameList.getSelectedItem();
         if(s != null && s.trim().length() > 0)
         {
@@ -442,12 +441,16 @@ public class PitApplet extends Frame
             flag = true;
         }
         if(flag)
-            return stringbuffer.toString();
+        {
+            String res = stringbuffer.toString();
+            res.replaceAll(" ", "%20");
+            return res;
+        }
         else
             return null;
     }
 
-    private String[][] getPitListArrayFromQuery(String s)
+   /* private String[][] getPitListArrayFromQuery(String s)
         throws Exception
     {
         Object obj = null;
@@ -455,10 +458,10 @@ public class PitApplet extends Frame
         try
         {
             Object obj1 = null;
-            URL url = new URL(server);
+            URL url = new URL(pitserver);
             HttpMessage httpmessage = new HttpMessage(url);
             java.util.Properties properties = new java.util.Properties();
-            properties.put("format", "pitlistarrayquery");
+            properties.put("TYPE", "JSONPITLIST_FROMQUERY");
             s = URLEncoder.encode(s, "UTF-8");
             properties.put("q", s);
             java.io.InputStream inputstream = httpmessage.sendGetMessage(properties);
@@ -470,18 +473,10 @@ public class PitApplet extends Frame
             System.out.println(exception.toString());
             exception.printStackTrace();
         }
-        if(obj instanceof String[][])
-        {
-            String as1[][] = (String[][])obj;
-            s = "";
-            return as1;
-        } else
-        {
-            String s1 = (String)obj;
-            System.out.println("Exception on query: " + s1);
-            throw new Exception(s1);
-        }
-    }
+       
+        as = (String[][])obj;
+        return as;
+    }*/
 
     private String[][] getOccListArrayFromQuery(String s)
         throws Exception
@@ -519,17 +514,45 @@ public class PitApplet extends Frame
         }
     }
 
+    
+    
+    private String[][] getPitListArrayFromQuery(String query)
+    {
+        String s = query.trim();
+        query = s.replace(" ", "%20");
+        String as[][] = (String[][])null;
+        try
+        {
+            ///URL url = new URL("http://www.kahrlconsulting.com:8087/avscience/PitServlet?TYPE=JSONPITLIST_FROMQUERY&QUERY=WHERE%20STATE%20=%20%27CA%27");
+            URL url = new URL("http://www.kahrlconsulting.com:8087/avscience/PitServlet?TYPE=JSONPITLIST_FROMQUERY&QUERY="+query);
+            HttpURLConnection servletConnection = (HttpURLConnection)url.openConnection();
+            servletConnection.setRequestProperty("Content-type","text/xml");
+            servletConnection.setDoInput(true);	
+            servletConnection.setUseCaches(false);
+            servletConnection.connect();
+            ObjectInputStream objectinputstream = new ObjectInputStream(servletConnection.getInputStream());
+            as = (String[][])objectinputstream.readObject();
+        }
+        catch(Exception exception)
+        {
+            System.out.println(exception.toString());
+            exception.printStackTrace();
+        }
+        return as;
+    }
+    
     private String[][] getPitListArray()
     {
         String as[][] = (String[][])null;
         try
         {
-            URL url = new URL(server);
-            HttpMessage httpmessage = new HttpMessage(url);
-            java.util.Properties properties = new java.util.Properties();
-            properties.put("format", "pitlist");
-            java.io.InputStream inputstream = httpmessage.sendGetMessage(properties);
-            ObjectInputStream objectinputstream = new ObjectInputStream(inputstream);
+            URL url = new URL("http://www.kahrlconsulting.com:8087/avscience/PitServlet?TYPE=JSONPITLIST");
+            HttpURLConnection servletConnection = (HttpURLConnection)url.openConnection();
+            servletConnection.setRequestProperty("Content-type","text/xml");
+            servletConnection.setDoInput(true);	
+            servletConnection.setUseCaches(false);
+            servletConnection.connect();
+            ObjectInputStream objectinputstream = new ObjectInputStream(servletConnection.getInputStream());
             as = (String[][])objectinputstream.readObject();
         }
         catch(Exception exception)
@@ -542,16 +565,16 @@ public class PitApplet extends Frame
 
     private String[][] getOccListArray()
     {
-        System.out.println("getOccListArray()");
         String as[][] = (String[][])null;
         try
         {
-            URL url = new URL(server);
-            HttpMessage httpmessage = new HttpMessage(url);
-            java.util.Properties properties = new java.util.Properties();
-            properties.put("format", "occlistarray");
-            java.io.InputStream inputstream = httpmessage.sendGetMessage(properties);
-            ObjectInputStream objectinputstream = new ObjectInputStream(inputstream);
+            URL url = new URL("http://www.kahrlconsulting.com:8087/avscience/PitServlet?TYPE=JSONOCCLIST");
+            HttpURLConnection servletConnection = (HttpURLConnection)url.openConnection();
+            servletConnection.setRequestProperty("Content-type","text/xml");
+            servletConnection.setDoInput(true);	
+            servletConnection.setUseCaches(false);
+            servletConnection.connect();
+            ObjectInputStream objectinputstream = new ObjectInputStream(servletConnection.getInputStream());
             as = (String[][])objectinputstream.readObject();
         }
         catch(Exception exception)
@@ -559,29 +582,32 @@ public class PitApplet extends Frame
             System.out.println(exception.toString());
             exception.printStackTrace();
         }
-        System.out.println("Occ list size: " + as[1].length);
         return as;
     }
 
-    private java.util.Vector getStateList()
+    private String[] getStateList()
     {
-        java.util.Vector vector = null;
+        String[] sts = null;
         try
         {
-            URL url = new URL(server);
-            HttpMessage httpmessage = new HttpMessage(url);
-            java.util.Properties properties = new java.util.Properties();
-            properties.put("format", "statelist");
-            java.io.InputStream inputstream = httpmessage.sendGetMessage(properties);
-            ObjectInputStream objectinputstream = new ObjectInputStream(inputstream);
-            vector = (java.util.Vector)objectinputstream.readObject();
+            /////////////////
+            URL url = new URL("http://www.kahrlconsulting.com:8087/avscience/PitServlet?TYPE=STATELIST");
+            HttpURLConnection servletConnection = (HttpURLConnection)url.openConnection();
+            servletConnection.setRequestProperty("Content-type","text/xml");
+            servletConnection.setDoInput(true);	
+            servletConnection.setUseCaches(false);
+            servletConnection.connect();
+            ObjectInputStream objectinputstream = new ObjectInputStream(servletConnection.getInputStream());
+            sts = (String[])objectinputstream.readObject();
+            //////////////////
+          
         }
         catch(Exception exception)
         {
             System.out.println(exception.toString());
             exception.printStackTrace();
         }
-        return vector;
+        return sts;
     }
 
     private java.util.Vector getLocationList()
@@ -605,25 +631,29 @@ public class PitApplet extends Frame
         return vector;
     }
 
-    private java.util.Vector getRangeList()
+    private String[] getRangeList()
     {
-        java.util.Vector vector = null;
+        String[] sts = null;
         try
         {
-            URL url = new URL(server);
-            HttpMessage httpmessage = new HttpMessage(url);
-            java.util.Properties properties = new java.util.Properties();
-            properties.put("format", "rangelist");
-            java.io.InputStream inputstream = httpmessage.sendGetMessage(properties);
-            ObjectInputStream objectinputstream = new ObjectInputStream(inputstream);
-            vector = (java.util.Vector)objectinputstream.readObject();
+            /////////////////
+            URL url = new URL("http://www.kahrlconsulting.com:8087/avscience/PitServlet?TYPE=RANGELIST");
+            HttpURLConnection servletConnection = (HttpURLConnection)url.openConnection();
+            servletConnection.setRequestProperty("Content-type","text/xml");
+            servletConnection.setDoInput(true);	
+            servletConnection.setUseCaches(false);
+            servletConnection.connect();
+            ObjectInputStream objectinputstream = new ObjectInputStream(servletConnection.getInputStream());
+            sts = (String[])objectinputstream.readObject();
+            //////////////////
+          
         }
         catch(Exception exception)
         {
             System.out.println(exception.toString());
             exception.printStackTrace();
         }
-        return vector;
+        return sts;
     }
 
     public PitObs getPit(String s)
@@ -634,7 +664,7 @@ public class PitApplet extends Frame
             URL url = new URL(pitserver);
             HttpMessage httpmessage = new HttpMessage(url);
             java.util.Properties properties = new java.util.Properties();
-            properties.put("TYPE", "PPCPIT");
+            properties.put("TYPE", "JSONPIT");
             properties.put("SERIAL", s);
             java.io.InputStream inputstream = httpmessage.sendGetMessage(properties);
             ObjectInputStream objectinputstream = new ObjectInputStream(inputstream);
@@ -771,26 +801,29 @@ public class PitApplet extends Frame
             for(int i = 0; i < pitlist[0].length; i++)
                 pitList.add(pitlist[0][i]);
 
-            if(!flag)
-                occlist = getOccListArray();
+           /* if(!flag)
+               occlist = getOccListArray();
             else
-                occlist = getOccListArrayFromQuery(whereClause());
+               occlist = getOccListArrayFromQuery(whereClause());
             occList.removeAll();
             for(int j = 0; j < occlist[0].length; j++)
                 occList.add(occlist[0][j]);
-
+                */
             nameList.removeAll();
             nameList.add("ALL");
-            String s;
-            for(java.util.Enumeration enumeration = getRangeList().elements(); enumeration.hasMoreElements(); nameList.add(s))
-                s = (String)enumeration.nextElement();
+            for (String s : getRangeList())
+            {
+                nameList.add(s);
+            }
+            
 
             stateList.removeAll();
             stateList.add("ALL");
-            String s1;
-            for(java.util.Enumeration enumeration1 = getStateList().elements(); enumeration1.hasMoreElements(); stateList.add(s1))
-                s1 = (String)enumeration1.nextElement();
-
+            for (String s : getStateList())
+            {
+                stateList.add(s);
+            }
+           
         }
         catch(Exception exception)
         {

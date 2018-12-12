@@ -100,6 +100,7 @@ public class SPV5DataStore implements java.io.Serializable
   	
     public void addOcc(AvOccurence occ)
   	{
+            System.out.println("ADD Av Occurence ......  ");
             if (occ!=null)
             {
                 String serial = occ.getSerial();

@@ -1356,7 +1356,7 @@ public class OccFrame extends Frame implements TimeFrame
     
     void save()
     {
-    	System.out.println("save()");
+    	System.out.println("OCC:FRame::save()");
     	String serial="";
     	if (!edit)
     	{

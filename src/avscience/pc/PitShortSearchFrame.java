@@ -14,7 +14,7 @@ import java.awt.event.*;
 
 public class PitShortSearchFrame extends Frame implements TimeFrame
 {
-	private static final String server="http://kahrlconsulting.com:8084/avscience/PitListServlet";
+	private static final String server="http://kahrlconsulting.com:8087/avscience/PitListServlet";
     org.compiere.grid.ed.Calendar estDate1;
     org.compiere.grid.ed.Calendar estDate2;
     java.awt.List locations = new java.awt.List();
